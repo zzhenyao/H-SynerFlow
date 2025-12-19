@@ -1,4 +1,3 @@
-```
 <div align="center">
   <div>
     <h1>
@@ -15,7 +14,6 @@
   </div>
   <br><br>
 </div>
-```
 
 
 ![](supp/fig_pipeline.png)
