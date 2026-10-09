@@ -1,0 +1,16 @@
+data/
+work_dir/*
+outputs/*
+.DS_Store
+.idea/
+models/
+!pre_trained/spatial_model.pt
+wandb/
+.vscode/
+*/__pycache__/
+__pycache__/
+*.py[cod]
+build/
+*.egg-info/
+config/params.csv
+config/params_back.csv

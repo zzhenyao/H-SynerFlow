@@ -1,0 +1,126 @@
+dataset: TES
+num_people: 1
+inputfeature: False
+use_amp: True
+# mode
+model: net.clip_target.Model
+model_args:
+  activation: 'relu'
+  clip_num: 120
+  overlap_ratio: 0
+  random_move: True
+  random_dropout: True
+
+
+# my_spatial_model
+# st_gcn.kinetics
+backbone_args:
+  type: "net.backbone.stgcn.STGCN" 
+  args:
+    in_channels: 3
+    edge_importance_weighting: True
+    graph_args:
+      layout: 'openpose'
+      strategy: 'spatial'
+    activation: 'relu'
+    dropout: 0
+    weights: ./pre_trained/spatial_model.pt
+    ignore_weights:
+    - fcn.weight
+    - fcn.bias
+
+featureadapter_args:
+  type: "net.featureadapter.clip_random_meanT.FeatureAdapter"
+  args:
+    activation: 'relu'
+    dropout: 0
+
+neck_args:
+  type: "net.neck.SHS.Neck"
+  args:
+    in_channels: 256
+    mid_channels: 64
+    out_channels: 256
+    dropout: 0
+
+head_args:
+  type: "net.head.PQM.Head"
+  args:
+    in_channels: 256
+    activation: 'relu'
+    dropout: 0
+    target_channels: 256
+    num_targets: 8
+    t_min_dis: 0.5
+
+
+
+
+
+# training
+device: [0]
+batch_size: 8
+test_batch_size: 1
+eval_interval: 1
+save_interval: 3000
+save_best: 5
+check_best_src: 0.67
+check_best_epoch: 0
+accumulation_steps: 1
+weight_path: null
+pretrain: False
+#optim
+base_lr: 0.001
+backbone_lr: 0.00001
+num_epoch: 220
+backbone_unfreeze_epoch: 20000
+optimizer: AdamW
+weight_decay: 0.00001
+#weight_decay: 0
+warm_up_epoch: 0
+opt_betas1: 0.95
+opt_betas2: 0.999
+
+
+opt_lr_scheduler: CosineAnnealingLR
+# StepLR
+opt_step_size: 500
+opt_gamma: 0.3
+
+# MultiStepLR
+opt_step: [30, 140, 290]
+
+# ReduceLROnPlateau
+opt_patience: 10
+opt_factor: 0.5
+opt_threshold: 0.0001
+
+# CosineAnnealingLR
+opt_T_max: 200
+opt_eta_min: 0.00001
+# CosineAnnealingWarmRestarts
+opt_T_mult: 2
+
+
+num_worker: 8
+
+
+
+# feeder
+feeder: feeder.feeder.Feeder
+train_feeder_args:
+  random_choose: False
+  random_move: False
+  window_size:  -1
+  data_path: /data/AQAdata/Fis-V/Fis-V_4500PEOPLE/DATASET/DATASET_data_train.npy
+  label_path: /data/AQAdata/Fis-V/Fis-V_4500PEOPLE/DATASET/DATASET_label_train.pkl
+  score_normalization: True
+  max_score: 2.0
+test_feeder_args:
+  data_path: /data/AQAdata/Fis-V/Fis-V_4500PEOPLE/DATASET/DATASET_data_test.npy
+  label_path: /data/AQAdata/Fis-V/Fis-V_4500PEOPLE/DATASET/DATASET_label_test.pkl
+  score_normalization: True
+  max_score: 2.0
+dataset_repath: True
+dataset_M_repath: True
+data_clip: False
